@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\Socials\FacebookController;
 use App\Http\Controllers\Auth\Socials\GoogleController;
 use App\Http\Controllers\Auth\Socials\TwitterController;
 use App\Http\Controllers\ProfileController;
@@ -30,13 +31,17 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
 
 
 // google auth routes
-Route::get('/auth/google/redirect', [GoogleController::class,'handleGoogleRedirect'])->name('google.redirect');
-Route::get('/auth/google/callback', [GoogleController::class,'handleGoogleCallback']);
+Route::get('/auth/google/redirect', [GoogleController::class, 'handleGoogleRedirect'])->name('google.redirect');
+Route::get('/auth/google/callback', [GoogleController::class, 'handleGoogleCallback']);
 
 //twitter auth routes
-Route::get('/auth/twitter/redirect', [TwitterController::class,'handleTwitterRedirect'])->name('x.redirect');
-Route::get('/auth/twitter/callback', [TwitterController::class,'handleTwitterCallback']);
+Route::get('/auth/twitter/redirect', [TwitterController::class, 'handleTwitterRedirect'])->name('x.redirect');
+Route::get('/auth/twitter/callback', [TwitterController::class, 'handleTwitterCallback']);
+
+//facebook auth routes
+Route::get('/auth/facebook/redirect', [FacebookController::class, 'handleFacebookRedirect'])->name('fb.redirect');
+Route::get('/auth/facebook/callback', [FacebookController::class, 'handleFacebookCallback']);
