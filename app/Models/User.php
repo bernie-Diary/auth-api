@@ -42,5 +42,16 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'auth_type' => 'array'
     ];
+
+    public function addAuthType(string $platform)
+    {
+        $authTypes = $this->auth_type ? explode(',', $this->auth_type) : [];
+        if (!in_array($platform, $authTypes)) {
+            $authTypes[] = $platform;
+            $this->auth_type = implode(',', $authTypes);
+            $this->save();
+        }
+    }
 }

@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
+use Illuminate\Support\Str;
 
 class FacebookController extends Controller
 {
@@ -18,24 +19,23 @@ class FacebookController extends Controller
     {
         try {
             $fbUser = Socialite::driver('facebook')->user();
-            $user = User::where('email', $fbUser->getEmail())->where('auth_type', 'facebook')->first();
+            $user = User::where('email', $fbUser->email)->first();
             if ($user) {
                 $user->update([
                     'access_token' => $fbUser->token,
                     "token_type" => "Bearer",
-                    'token_expiration' => now()->addSeconds($fbUser->expiresIn),
                 ]);
             } else {
                 $user = User::create([
-                    'name' => $fbUser->name,
+                    'name' =>  $fbUser->name,
+                    "username" => $fbUser->nickname ?? "username",
                     'email' => $fbUser->email,
-                    'auth_type' => 'facebook',
-                    'access_token' => $fbUser->token,
-                    "token_type" => "Bearer",
-                    'token_expiration' => now()->addSeconds($fbUser->expiresIn)->format('Y-m-d H:i:s'),
+                    'auth_type' => [],
+                    'password' => bcrypt(str::random(10)),
                 ]);
             }
-            Auth::login($user);
+            // Auth::login($user);
+            $user->addAuthType('facebook');
             return response()->json([
                 'data' => [
                     'access_token' => $fbUser->token,

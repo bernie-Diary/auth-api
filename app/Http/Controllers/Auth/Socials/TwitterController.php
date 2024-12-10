@@ -7,6 +7,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
+use Illuminate\Support\Str;
+
 
 class TwitterController extends Controller
 {
@@ -18,24 +20,24 @@ class TwitterController extends Controller
     {
         try {
             $xUser = Socialite::driver('twitter')->user();
-            $user = User::where('email', $xUser->getEmail())->where('auth_type', 'twitter')->first();
+            $user = User::where('email', $xUser->email)->first();
+
             if ($user) {
                 $user->update([
                     'access_token' => $xUser->token,
                     "token_type" => "Bearer",
-                    'token_expiration' => now()->addSeconds($xUser->expiresIn),
                 ]);
             } else {
                 $user = User::create([
-                    'name' => $xUser->name,
+                    'name' =>  $xUser->name,
+                    "username" => $xUser->nickname ?? "username",
                     'email' => $xUser->email,
-                    'auth_type' => 'twitter',
-                    'access_token' => $xUser->token,
-                    "token_type" => "Bearer",
-                    'token_expiration' => now()->addSeconds($xUser->expiresIn)->format('Y-m-d H:i:s'),
+                    'auth_type' => [],
+                    'password' => bcrypt(str::random(10)),
                 ]);
             }
-            Auth::login($user);
+            $user->addAuthType('twitter');
+
             return response()->json([
                 'data' => [
                     'access_token' => $xUser->token,
